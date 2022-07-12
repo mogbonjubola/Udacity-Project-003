@@ -147,7 +147,9 @@ jobs:
             npm install
             npm audit fix --audit-level=critical --force
   send-notification:
-    jobs:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:  
       - notify:
           context: slack-secrets          
 #  deploy-infrastructure:
