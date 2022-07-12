@@ -2,7 +2,8 @@ Description: >
   UdaPeople backend stack.
 
 Parameters:
-  ID:
+  ID: 
+    Default: workflow-id
     Description: Unique identifier.
     Type: String
 
