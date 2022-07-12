@@ -3,21 +3,24 @@ orbs:
   slack: circleci/slack@4.10.1
 
 commands:
-  destroy-environment:
+  destroy-environments:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
-      workflow_id:
-        type: string 
-        default: ${CICRCLE_WORKFLOW_ID:0:7}  
+      frontend:
+        type: string
+      backend:
+        type: string
+      bucket:
+        type: string
     steps:
       - run:
-          name: Destroy environments
+          name: Destroy environment
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name udapeople-backend-<<parameters.workflow_id >>
-            aws s3 rm s3://udapeople-<<parameters.workflow_id>> --recursive
-            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.workflow_id >>
-          #  exit 1
+            aws cloudformation delete-stack --stack-name << parameters.frontend >>
+            aws cloudformation delete-stack --stack-name << parameters.backend >>
+            aws s3 rm "s3://udapeople-<< parameters.bucket >>" --recursive
+
   #revert-migrations:
     #description: Revert the last migration if successfully run in the current workflow.
     #parameters:
@@ -180,18 +183,19 @@ jobs:
       - run:
           name: Add back-end ip to ansible inventory
           command: |
-            echo $(aws ec2 describe-instances \
+            aws ec2 describe-instances \
             --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --filters Name=tag:aws:cloudformation:stack-name,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7} \
-            --output text) >> ~/project/.circleci/ansible/inventory.txt
-            cat ~/project/.circleci/ansible/inventory.txt
+            --filters "Name=tag:project,Values=udapeople" --output text > ~/tmpfile.txt
       - persist_to_workspace:
           root: ~/
           paths:
-            - Udacity-Project-003/.circleci/ansible/inventory.txt
-      # Here's where you will add some code to rollback on failure      
-      - destroy-environment:
-          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+            - tmpfile.txt
+      # Here's where you will add some code to rollback on failure 
+      - destroy-environments:
+          frontend: "udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}"
+          backend: "udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}"
+          bucket: "${CIRCLE_WORKFLOW_ID:0:7}"
+      
 #  configure-infrastructure:
   #  docker:
       # Docker image here that supports Ansible
