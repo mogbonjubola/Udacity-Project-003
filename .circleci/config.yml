@@ -228,7 +228,7 @@ jobs:
       # Docker image here that supports NodeJS
     steps:
       - checkout
-      - restore-cache:
+      - restore_cache:
           keys: [backend-build]
       # Checkout code from git
 
