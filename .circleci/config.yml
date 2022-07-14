@@ -228,19 +228,10 @@ jobs:
       # Docker image here that supports NodeJS
     steps:
       - checkout
+      - install_awscli
       - restore_cache:
           keys: [backend-build]
       # Checkout code from git
-
-      - run:
-          name: Install dependencies
-          command: |
-             # yum install tar gzip npm nodejs curl -y
-            yum install -y tar gzip curl
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip -qq awscliv2.zip
-            sudo ./aws/install
-            # apk add --update --no-cache tar gzip nodejs npm aws-cli curl
       - run:
           name: Run migrations
           command: |
