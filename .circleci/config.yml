@@ -224,9 +224,6 @@ jobs:
 
   run-migrations:
     docker:
-      - image: python:3.7-alpine3.11
-      # Drun-migrations:
-    docker:
       - image: python:3.7-alpine3.16
     steps:
       - checkout
